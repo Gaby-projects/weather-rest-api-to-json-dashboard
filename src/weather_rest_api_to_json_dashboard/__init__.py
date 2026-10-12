@@ -1,5 +1,6 @@
 import csv
 import json
+import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -98,6 +99,11 @@ def save_csv(path: Path, history: list[dict]) -> None:
 
 
 def main() -> None:
+    # On Windows, stdout may default to a legacy code page (e.g. cp1252 when
+    # piped), which garbles "°" and city names like "Bogotá".
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
     fetched_at = datetime.now(UTC).isoformat()
     history = load_history(HISTORY_FILE)
 

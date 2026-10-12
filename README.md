@@ -14,7 +14,7 @@ history of every forecast it has fetched, exported as JSON, CSV and a static HTM
   pandas) and `dashboard.html`.
 - **Static dashboard:** KPI cards per city (average max/min temperature, total precipitation,
   rainiest day) and a 7-day table, built from the latest fetch. Open it by double-clicking: no
-  server or internet connection needed.
+  server or internet connection needed. Works on mobile too.
 - **Works behind TLS-inspecting software:** uses the OS certificate store (`truststore`), so
   HTTPS requests don't fail when an antivirus or proxy injects its own root certificate.
 
@@ -45,6 +45,14 @@ uv run weather-rest-api-to-json-dashboard
 Each run prints a 7-day summary per city to the console and writes the three output files to
 the current directory (they are created on the first run).
 
+## Tests
+
+```bash
+uv run pytest
+```
+
+GitHub Actions runs `ruff` and the test suite on every push and pull request to `main`.
+
 ## Output format
 
 Each record in `weather_history.json` (and each row in `weather_history.csv`) looks like:
@@ -66,6 +74,8 @@ Each record in `weather_history.json` (and each row in `weather_history.csv`) lo
 - `temp_max` / `temp_min`: °C. `precipitation`: daily total in mm.
 - `weathercode`: [WMO weather code](https://open-meteo.com/en/docs#weather_variable_documentation).
 
+If the API returns `null` for a value, it is stored as `null` and the dashboard shows a dash.
+
 ## Project structure
 
 ```
@@ -73,4 +83,6 @@ src/weather_rest_api_to_json_dashboard/
 ├── __init__.py   # fetch from Open-Meteo, build records, save JSON/CSV, main()
 ├── __main__.py   # allows `python -m weather_rest_api_to_json_dashboard`
 └── dashboard.py  # renders the static HTML dashboard
+tests/              # pytest suite (records, history files, dashboard KPIs)
+.github/workflows/  # CI: ruff + pytest
 ```
